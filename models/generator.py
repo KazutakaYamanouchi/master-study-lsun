@@ -46,21 +46,17 @@ class Generator(nn.Module):
         logger.debug('Generatorのインスタンスを作成します。')
         self.blocks = nn.ModuleList([
             # 1 -> 4
-            GBlock(
-                nz, 256, 4,
-                stride=1, padding=0),
+            GBlock(nz, 512, 4,stride=1, padding=0),
             # 4 -> 8
-            GBlock(
-                256, 128, 4,
-                stride=2, padding=1),
+            GBlock(512, 512, 4,stride=2, padding=1),
             # 8 -> 16
-            GBlock(
-                128, 64, 4,
-                stride=2, padding=1),
+            GBlock(512, 256, 4,stride=2, padding=1),
             # 16 -> 32
-            GBlock(
-                64, 32, 4,
-                stride=2, padding=1),
+            GBlock(256, 128, 4,stride=2, padding=1),
+            # 32 -> 64
+            GBlock(128, 64, 4,stride=2, padding=1),
+            # 64 -> 128
+            GBlock(64, 32, 4,stride=2, padding=1),
         ])
 
         self.last = nn.Conv2d(32, nc, 1, stride=1, padding=0)

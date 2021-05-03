@@ -59,8 +59,8 @@ parser.add_argument(
 
 parser.add_argument(
     '--dataset', help='データセットを指定します。',
-    type=str, default='cifar10',
-    choices=['mnist', 'fashion_mnist', 'cifar10', 'stl10', 'imagenet2012']
+    type=str, default='celeba',
+    choices=['mnist', 'fashion_mnist', 'cifar10', 'stl10', 'imagenet2012', 'celeba']
 )
 parser.add_argument(
     '--data-path', help='データセットのパスを指定します。',
@@ -208,6 +208,8 @@ logger.info(f'メインデバイスとして〈{device}〉が選択されまし�
 
 logger.info('画像に適用する変換のリストを定義します。')
 data_transforms = []
+crop = transforms.CenterCrop(128)
+data_transforms.append(crop)
 to_tensor = transforms.ToTensor()
 data_transforms.append(to_tensor)
 
@@ -215,13 +217,21 @@ normalize = transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 data_transforms.append(normalize)
 logger.info('変換リストに正規化を追加しました。')
 
-# dataset = dset.STL10(
-#            root=args.data_path, split='train',
-#            transform=transforms.Compose(data_transforms), download=True)
+"""
+# CelebAのダウンロード
 
-dataset = dset.CIFAR10(
-            root=args.data_path, train=True,
-            transform=transforms.Compose(data_transforms), download=True)
+import torchvision
+torchvision.datasets.CelebA(
+    root='~/.datasets/vision',  # ルートパスを共有データセットディレクトリに
+    split='all',  # Splitの指定(Train, Validation, Test)、allで全対象
+    target_type=['attr', 'identity', 'bbox', 'landmarks'],  # ラベルの種類を指定
+    download=True  # ダウンロードの有効化
+)
+"""
+
+dataset = dset.CelebA(
+           root=args.data_path, split='all',
+           transform=transforms.Compose(data_transforms), download=True)
 
 # データセットの1番目の画像から色数を取得
 nc, h, w = dataset[0][0].size()  # dataset[0][0].size() = (C, H, W)

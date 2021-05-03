@@ -128,8 +128,9 @@ class DWT(nn.Module):
         # YCbCr変換(DCレベルシフト済み)
         # ll = self.to_ycbcr(shifted)
         ll = self.to_ycbcr(image)
-        # DWT k回
-        for i in range(k):
+        # DWTを0~32回で段階的に
+        dwt_np = [0, 6, 12, 18, 24, 32]
+        for i in range(dwt_np[k]):
             ll = self.dwt_vertical(self.dwt_horizontal(ll))
         # RGB変換(DCレベルシフト済み)
         rgb_shifted = self.to_rgb(ll)

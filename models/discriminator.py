@@ -48,17 +48,21 @@ class Discriminator(nn.Module):
         logger.debug('Discriminatorのインスタンスを作成します。')
 
         self.blocks = nn.Sequential(
-            # 32 -> 16
+            # 128 -> 64
             DBlock(nc, 32, 3, stride=2, padding=1),
-            # 16 -> 8
+            # 64 -> 32
             DBlock(32, 64, 3, stride=2, padding=1),
-            # 8 -> 4
+            # 32 -> 16
             DBlock(64, 128, 3, stride=2, padding=1),
+            # 16 -> 8
+            DBlock(128, 256, 3, stride=2, padding=1),
+            # 8 -> 4
+            DBlock(256, 512, 3, stride=2, padding=1),
             # 4 -> 1
-            DBlock(128, 256, 4, stride=1, padding=0),
+            DBlock(512, 512, 4, stride=1, padding=0),
         )
 
-        self.real_fake = nn.Linear(256, 1)
+        self.real_fake = nn.Linear(512, 1)
 
     def forward(
         self, x, classes=None,
