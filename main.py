@@ -86,7 +86,7 @@ parser.add_argument(
 
 parser.add_argument(
     '--nz', help='潜在空間の次元を指定します。',
-    type=int, default=256
+    type=int, default=512
 )
 
 #   画像生成
@@ -96,13 +96,18 @@ parser.add_argument(
 )
 parser.add_argument(
     '--sample-interval', help='生成画像の保存間隔をエポック数で指定します。',
-    type=int, default=10,
+    type=int, default=1,
 )
 
 
 #   モデルの保存
 parser.add_argument(
     '--dct', help='dctにて周波数分解を実行します。',
+    action='store_true'
+)
+
+parser.add_argument(
+    '--dcgan', help='元データで学習をを実行します。',
     action='store_true'
 )
 
@@ -325,7 +330,8 @@ for epoch in range(num_epochs):
     begin_time = perf_counter()  # 時間計測開始
     for i, (real_images, _) in pbar:
         real_images = real_images.to(device)
-        real_images = wavelet(real_images, num_progress)
+        if not args.dcgan:
+            real_images = wavelet(real_images, num_progress)
         z = torch.randn(batch_size, nz, device=device)
         fake_images = model_g(z)
 

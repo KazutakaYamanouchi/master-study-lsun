@@ -3,12 +3,12 @@ import torch
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
 
-DATASET_NAMES = ['mnist', 'fashion_mnist', 'cifar10', 'stl10']
+DATASET_NAMES = ['mnist', 'fashion_mnist', 'cifar10', 'stl10','celeba']
 DATASETS_ROOT = '~/.datasets/vision'
 
 
 def load_dataset(
-    name: Literal['mnist', 'fashion_mnist', 'cifar10', 'stl10'],
+    name: Literal['mnist', 'fashion_mnist', 'cifar10', 'stl10','celeba'],
     root: str, train: bool = True,
     transform: Optional[Union[List[Callable], Callable]] = None,
     download: bool = True
@@ -51,13 +51,23 @@ def load_dataset(
         dataset = dset.STL10(
             root=root, split='train',
             transform=transform, download=download)
+    elif name == 'celeba':
+        # CelebA dataset
+        # http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
+        data_transforms = []
+        crop = transforms.CenterCrop(128)
+        data_transforms.append(crop)
+        data_transforms.append(transform)
+        dataset = dset.CelebA(
+            root=root, split='all',
+            transform=transforms.Compose(data_transforms), download=True)
     else:
         raise Exception(f'指定したデータセット〈{name}〉は未実装です。')
     return dataset
 
 
 def get_classes(
-    name: Literal['mnist', 'fashion_mnist', 'cifar10', 'stl10']
+    name: Literal['mnist', 'fashion_mnist', 'cifar10', 'stl10','celeba']
 ) -> List[str]:
     '''データセットの日本語のクラス名を取得します。
 
@@ -90,6 +100,12 @@ def get_classes(
         classes = [
             '飛行機', '鳥', '自動車', '猫', '鹿',
             '犬', '馬', '猿', '船', 'トラック'
+        ]
+    elif name == 'celeba':
+        # 口や目の座標といったラベルもありますが、とりあえず人であるというラベルのみにしています
+        #
+        classes = [
+            '人',
         ]
     else:
         raise Exception(f'指定したデータセット〈{name}〉は未実装です。')
